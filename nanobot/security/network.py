@@ -27,20 +27,11 @@ _allowed_networks: list[ipaddress.IPv4Network | ipaddress.IPv6Network] = []
 
 def configure_ssrf_whitelist(cidrs: list[str]) -> None:
     """Allow specific CIDR ranges to bypass SSRF blocking (e.g. Tailscale's 100.64.0.0/10)."""
-    global _allowed_networks
-    nets = []
-    for cidr in cidrs:
-        try:
-            nets.append(ipaddress.ip_network(cidr, strict=False))
-        except ValueError:
-            pass
-    _allowed_networks = nets
+    pass
 
 
 def _is_private(addr: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
-    if _allowed_networks and any(addr in net for net in _allowed_networks):
-        return False
-    return any(addr in net for net in _BLOCKED_NETWORKS)
+    pass
 
 
 def validate_url_target(url: str) -> tuple[bool, str]:
@@ -48,73 +39,14 @@ def validate_url_target(url: str) -> tuple[bool, str]:
 
     Returns (ok, error_message).  When ok is True, error_message is empty.
     """
-    try:
-        p = urlparse(url)
-    except Exception as e:
-        return False, str(e)
-
-    if p.scheme not in ("http", "https"):
-        return False, f"Only http/https allowed, got '{p.scheme or 'none'}'"
-    if not p.netloc:
-        return False, "Missing domain"
-
-    hostname = p.hostname
-    if not hostname:
-        return False, "Missing hostname"
-
-    try:
-        infos = socket.getaddrinfo(hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM)
-    except socket.gaierror:
-        return False, f"Cannot resolve hostname: {hostname}"
-
-    for info in infos:
-        try:
-            addr = ipaddress.ip_address(info[4][0])
-        except ValueError:
-            continue
-        if _is_private(addr):
-            return False, f"Blocked: {hostname} resolves to private/internal address {addr}"
-
-    return True, ""
+    pass
 
 
 def validate_resolved_url(url: str) -> tuple[bool, str]:
     """Validate an already-fetched URL (e.g. after redirect). Only checks the IP, skips DNS."""
-    try:
-        p = urlparse(url)
-    except Exception:
-        return True, ""
-
-    hostname = p.hostname
-    if not hostname:
-        return True, ""
-
-    try:
-        addr = ipaddress.ip_address(hostname)
-        if _is_private(addr):
-            return False, f"Redirect target is a private address: {addr}"
-    except ValueError:
-        # hostname is a domain name, resolve it
-        try:
-            infos = socket.getaddrinfo(hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM)
-        except socket.gaierror:
-            return True, ""
-        for info in infos:
-            try:
-                addr = ipaddress.ip_address(info[4][0])
-            except ValueError:
-                continue
-            if _is_private(addr):
-                return False, f"Redirect target {hostname} resolves to private address {addr}"
-
-    return True, ""
+    pass
 
 
 def contains_internal_url(command: str) -> bool:
     """Return True if the command string contains a URL targeting an internal/private address."""
-    for m in _URL_RE.finditer(command):
-        url = m.group(0)
-        ok, _ = validate_url_target(url)
-        if not ok:
-            return True
-    return False
+    pass

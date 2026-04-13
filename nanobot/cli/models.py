@@ -11,11 +11,11 @@ from typing import Any
 
 
 def get_all_models() -> list[str]:
-    return []
+    pass
 
 
 def find_model_info(model_name: str) -> dict[str, Any] | None:
-    return None
+    pass
 
 
 def get_model_context_limit(model: str, provider: str = "auto") -> int | None:
@@ -28,4 +28,4 @@ def get_model_suggestions(partial: str, provider: str = "auto", limit: int = 20)
 
 def format_token_count(tokens: int) -> str:
     """Format token count for display (e.g., 200000 -> '200,000')."""
-    return f"{tokens:,}"
+    pass

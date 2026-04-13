@@ -27,30 +27,16 @@ class SpawnTool(Tool):
 
     def set_context(self, channel: str, chat_id: str) -> None:
         """Set the origin context for subagent announcements."""
-        self._origin_channel = channel
-        self._origin_chat_id = chat_id
-        self._session_key = f"{channel}:{chat_id}"
+        pass
 
     @property
     def name(self) -> str:
-        return "spawn"
+        pass
 
     @property
     def description(self) -> str:
-        return (
-            "Spawn a subagent to handle a task in the background. "
-            "Use this for complex or time-consuming tasks that can run independently. "
-            "The subagent will complete the task and report back when done. "
-            "For deliverables or existing projects, inspect the workspace first "
-            "and use a dedicated subdirectory when helpful."
-        )
+        pass
 
     async def execute(self, task: str, label: str | None = None, **kwargs: Any) -> str:
         """Spawn a subagent to execute the given task."""
-        return await self._manager.spawn(
-            task=task,
-            label=label,
-            origin_channel=self._origin_channel,
-            origin_chat_id=self._origin_chat_id,
-            session_key=self._session_key,
-        )
+        pass

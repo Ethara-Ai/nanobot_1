@@ -33,7 +33,7 @@ class AgentHook:
         self._reraise = reraise
 
     def wants_streaming(self) -> bool:
-        return False
+        pass
 
     async def before_iteration(self, context: AgentHookContext) -> None:
         pass
@@ -51,7 +51,7 @@ class AgentHook:
         pass
 
     def finalize_content(self, context: AgentHookContext, content: str | None) -> str | None:
-        return content
+        pass
 
 
 class CompositeHook(AgentHook):
@@ -69,35 +69,25 @@ class CompositeHook(AgentHook):
         self._hooks = list(hooks)
 
     def wants_streaming(self) -> bool:
-        return any(h.wants_streaming() for h in self._hooks)
+        pass
 
     async def _for_each_hook_safe(self, method_name: str, *args: Any, **kwargs: Any) -> None:
-        for h in self._hooks:
-            if getattr(h, "_reraise", False):
-                await getattr(h, method_name)(*args, **kwargs)
-                continue
-
-            try:
-                await getattr(h, method_name)(*args, **kwargs)
-            except Exception:
-                logger.exception("AgentHook.{} error in {}", method_name, type(h).__name__)
+        pass
 
     async def before_iteration(self, context: AgentHookContext) -> None:
-        await self._for_each_hook_safe("before_iteration", context)
+        pass
 
     async def on_stream(self, context: AgentHookContext, delta: str) -> None:
-        await self._for_each_hook_safe("on_stream", context, delta)
+        pass
 
     async def on_stream_end(self, context: AgentHookContext, *, resuming: bool) -> None:
-        await self._for_each_hook_safe("on_stream_end", context, resuming=resuming)
+        pass
 
     async def before_execute_tools(self, context: AgentHookContext) -> None:
-        await self._for_each_hook_safe("before_execute_tools", context)
+        pass
 
     async def after_iteration(self, context: AgentHookContext) -> None:
-        await self._for_each_hook_safe("after_iteration", context)
+        pass
 
     def finalize_content(self, context: AgentHookContext, content: str | None) -> str | None:
-        for h in self._hooks:
-            content = h.finalize_content(context, content)
-        return content
+        pass

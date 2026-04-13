@@ -17,12 +17,7 @@ _TEMPLATES_ROOT = Path(__file__).resolve().parent.parent / "templates"
 @lru_cache
 def _environment() -> Environment:
     # Plain-text prompts: do not HTML-escape variable values.
-    return Environment(
-        loader=FileSystemLoader(str(_TEMPLATES_ROOT)),
-        autoescape=False,
-        trim_blocks=True,
-        lstrip_blocks=True,
-    )
+    pass
 
 
 def render_template(name: str, *, strip: bool = False, **kwargs: Any) -> str:
@@ -31,5 +26,4 @@ def render_template(name: str, *, strip: bool = False, **kwargs: Any) -> str:
     Use ``strip=True`` for single-line user-facing strings when the file ends
     with a trailing newline you do not want preserved.
     """
-    text = _environment().get_template(name).render(**kwargs)
-    return text.rstrip() if strip else text
+    pass

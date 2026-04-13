@@ -39,19 +39,7 @@ class BaseChannel(ABC):
 
     async def transcribe_audio(self, file_path: str | Path) -> str:
         """Transcribe an audio file via Whisper (OpenAI or Groq). Returns empty string on failure."""
-        if not self.transcription_api_key:
-            return ""
-        try:
-            if self.transcription_provider == "openai":
-                from nanobot.providers.transcription import OpenAITranscriptionProvider
-                provider = OpenAITranscriptionProvider(api_key=self.transcription_api_key)
-            else:
-                from nanobot.providers.transcription import GroqTranscriptionProvider
-                provider = GroqTranscriptionProvider(api_key=self.transcription_api_key)
-            return await provider.transcribe(file_path)
-        except Exception as e:
-            logger.warning("{}: audio transcription failed: {}", self.name, e)
-            return ""
+        pass
 
     async def login(self, force: bool = False) -> bool:
         """
@@ -63,7 +51,7 @@ class BaseChannel(ABC):
         Returns True if already authenticated or login succeeds.
         Override in subclasses that support interactive login.
         """
-        return True
+        pass
 
     @abstractmethod
     async def start(self) -> None:
@@ -110,19 +98,11 @@ class BaseChannel(ABC):
     @property
     def supports_streaming(self) -> bool:
         """True when config enables streaming AND this subclass implements send_delta."""
-        cfg = self.config
-        streaming = cfg.get("streaming", False) if isinstance(cfg, dict) else getattr(cfg, "streaming", False)
-        return bool(streaming) and type(self).send_delta is not BaseChannel.send_delta
+        pass
 
     def is_allowed(self, sender_id: str) -> bool:
         """Check if *sender_id* is permitted.  Empty list → deny all; ``"*"`` → allow all."""
-        allow_list = getattr(self.config, "allow_from", [])
-        if not allow_list:
-            logger.warning("{}: allow_from is empty — all access denied", self.name)
-            return False
-        if "*" in allow_list:
-            return True
-        return str(sender_id) in allow_list
+        pass
 
     async def _handle_message(
         self,
@@ -146,36 +126,14 @@ class BaseChannel(ABC):
             metadata: Optional channel-specific metadata.
             session_key: Optional session key override (e.g. thread-scoped sessions).
         """
-        if not self.is_allowed(sender_id):
-            logger.warning(
-                "Access denied for sender {} on channel {}. "
-                "Add them to allowFrom list in config to grant access.",
-                sender_id, self.name,
-            )
-            return
-
-        meta = metadata or {}
-        if self.supports_streaming:
-            meta = {**meta, "_wants_stream": True}
-
-        msg = InboundMessage(
-            channel=self.name,
-            sender_id=str(sender_id),
-            chat_id=str(chat_id),
-            content=content,
-            media=media or [],
-            metadata=meta,
-            session_key_override=session_key,
-        )
-
-        await self.bus.publish_inbound(msg)
+        pass
 
     @classmethod
     def default_config(cls) -> dict[str, Any]:
         """Return default config for onboard. Override in plugins to auto-populate config.json."""
-        return {"enabled": False}
+        pass
 
     @property
     def is_running(self) -> bool:
         """Check if the channel is running."""
-        return self._running
+        pass

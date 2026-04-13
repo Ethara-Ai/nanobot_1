@@ -74,114 +74,34 @@ class HeartbeatService:
 
     @property
     def heartbeat_file(self) -> Path:
-        return self.workspace / "HEARTBEAT.md"
+        pass
 
     def _read_heartbeat_file(self) -> str | None:
-        if self.heartbeat_file.exists():
-            try:
-                return self.heartbeat_file.read_text(encoding="utf-8")
-            except Exception:
-                return None
-        return None
+        pass
 
     async def _decide(self, content: str) -> tuple[str, str]:
         """Phase 1: ask LLM to decide skip/run via virtual tool call.
 
         Returns (action, tasks) where action is 'skip' or 'run'.
         """
-        from nanobot.utils.helpers import current_time_str
-
-        response = await self.provider.chat_with_retry(
-            messages=[
-                {"role": "system", "content": "You are a heartbeat agent. Call the heartbeat tool to report your decision."},
-                {"role": "user", "content": (
-                    f"Current Time: {current_time_str(self.timezone)}\n\n"
-                    "Review the following HEARTBEAT.md and decide whether there are active tasks.\n\n"
-                    f"{content}"
-                )},
-            ],
-            tools=_HEARTBEAT_TOOL,
-            model=self.model,
-        )
-
-        if not response.has_tool_calls:
-            return "skip", ""
-
-        args = response.tool_calls[0].arguments
-        return args.get("action", "skip"), args.get("tasks", "")
+        pass
 
     async def start(self) -> None:
         """Start the heartbeat service."""
-        if not self.enabled:
-            logger.info("Heartbeat disabled")
-            return
-        if self._running:
-            logger.warning("Heartbeat already running")
-            return
-
-        self._running = True
-        self._task = asyncio.create_task(self._run_loop())
-        logger.info("Heartbeat started (every {}s)", self.interval_s)
+        pass
 
     def stop(self) -> None:
         """Stop the heartbeat service."""
-        self._running = False
-        if self._task:
-            self._task.cancel()
-            self._task = None
+        pass
 
     async def _run_loop(self) -> None:
         """Main heartbeat loop."""
-        while self._running:
-            try:
-                await asyncio.sleep(self.interval_s)
-                if self._running:
-                    await self._tick()
-            except asyncio.CancelledError:
-                break
-            except Exception as e:
-                logger.error("Heartbeat error: {}", e)
+        pass
 
     async def _tick(self) -> None:
         """Execute a single heartbeat tick."""
-        from nanobot.utils.evaluator import evaluate_response
-
-        content = self._read_heartbeat_file()
-        if not content:
-            logger.debug("Heartbeat: HEARTBEAT.md missing or empty")
-            return
-
-        logger.info("Heartbeat: checking for tasks...")
-
-        try:
-            action, tasks = await self._decide(content)
-
-            if action != "run":
-                logger.info("Heartbeat: OK (nothing to report)")
-                return
-
-            logger.info("Heartbeat: tasks found, executing...")
-            if self.on_execute:
-                response = await self.on_execute(tasks)
-
-                if response:
-                    should_notify = await evaluate_response(
-                        response, tasks, self.provider, self.model,
-                    )
-                    if should_notify and self.on_notify:
-                        logger.info("Heartbeat: completed, delivering response")
-                        await self.on_notify(response)
-                    else:
-                        logger.info("Heartbeat: silenced by post-run evaluation")
-        except Exception:
-            logger.exception("Heartbeat execution failed")
+        pass
 
     async def trigger_now(self) -> str | None:
         """Manually trigger a heartbeat."""
-        content = self._read_heartbeat_file()
-        if not content:
-            return None
-        action, tasks = await self._decide(content)
-        if action != "run" or not self.on_execute:
-            return None
-        return await self.on_execute(tasks)
+        pass

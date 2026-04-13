@@ -21,43 +21,17 @@ _state: dict[str, ReadState] = {}
 
 
 def _hash_file(p: str) -> str | None:
-    try:
-        return hashlib.sha256(Path(p).read_bytes()).hexdigest()
-    except OSError:
-        return None
+    pass
 
 
 def record_read(path: str | Path, offset: int = 1, limit: int | None = None) -> None:
     """Record that a file was read (called after successful read)."""
-    p = str(Path(path).resolve())
-    try:
-        mtime = os.path.getmtime(p)
-    except OSError:
-        return
-    _state[p] = ReadState(
-        mtime=mtime,
-        offset=offset,
-        limit=limit,
-        content_hash=_hash_file(p),
-        can_dedup=True,
-    )
+    pass
 
 
 def record_write(path: str | Path) -> None:
     """Record that a file was written (updates mtime in state)."""
-    p = str(Path(path).resolve())
-    try:
-        mtime = os.path.getmtime(p)
-    except OSError:
-        _state.pop(p, None)
-        return
-    _state[p] = ReadState(
-        mtime=mtime,
-        offset=1,
-        limit=None,
-        content_hash=_hash_file(p),
-        can_dedup=False,
-    )
+    pass
 
 
 def check_read(path: str | Path) -> str | None:
@@ -67,39 +41,14 @@ def check_read(path: str | Path) -> str | None:
     When mtime changed but file content is identical (e.g. touch, editor save),
     the check passes to avoid false-positive staleness warnings.
     """
-    p = str(Path(path).resolve())
-    entry = _state.get(p)
-    if entry is None:
-        return "Warning: file has not been read yet. Read it first to verify content before editing."
-    try:
-        current_mtime = os.path.getmtime(p)
-    except OSError:
-        return None
-    if current_mtime != entry.mtime:
-        if entry.content_hash and _hash_file(p) == entry.content_hash:
-            entry.mtime = current_mtime
-            return None
-        return "Warning: file has been modified since last read. Re-read to verify content before editing."
-    return None
+    pass
 
 
 def is_unchanged(path: str | Path, offset: int = 1, limit: int | None = None) -> bool:
     """Return True if file was previously read with same params and mtime is unchanged."""
-    p = str(Path(path).resolve())
-    entry = _state.get(p)
-    if entry is None:
-        return False
-    if not entry.can_dedup:
-        return False
-    if entry.offset != offset or entry.limit != limit:
-        return False
-    try:
-        current_mtime = os.path.getmtime(p)
-    except OSError:
-        return False
-    return current_mtime == entry.mtime
+    pass
 
 
 def clear() -> None:
     """Clear all tracked state (useful for testing)."""
-    _state.clear()
+    pass

@@ -71,10 +71,7 @@ class AzureOpenAIProvider(LLMProvider):
         reasoning_effort: str | None = None,
     ) -> bool:
         """Return True when temperature is likely supported for this deployment."""
-        if reasoning_effort:
-            return False
-        name = deployment_name.lower()
-        return not any(token in name for token in ("gpt-5", "o1", "o3", "o4"))
+        pass
 
     def _build_body(
         self,
@@ -87,41 +84,11 @@ class AzureOpenAIProvider(LLMProvider):
         tool_choice: str | dict[str, Any] | None,
     ) -> dict[str, Any]:
         """Build the Responses API request body from Chat-Completions-style args."""
-        deployment = model or self.default_model
-        instructions, input_items = convert_messages(self._sanitize_empty_content(messages))
-
-        body: dict[str, Any] = {
-            "model": deployment,
-            "instructions": instructions or None,
-            "input": input_items,
-            "max_output_tokens": max(1, max_tokens),
-            "store": False,
-            "stream": False,
-        }
-
-        if self._supports_temperature(deployment, reasoning_effort):
-            body["temperature"] = temperature
-
-        if reasoning_effort:
-            body["reasoning"] = {"effort": reasoning_effort}
-            body["include"] = ["reasoning.encrypted_content"]
-
-        if tools:
-            body["tools"] = convert_tools(tools)
-            body["tool_choice"] = tool_choice or "auto"
-
-        return body
+        pass
 
     @staticmethod
     def _handle_error(e: Exception) -> LLMResponse:
-        response = getattr(e, "response", None)
-        body = getattr(e, "body", None) or getattr(response, "text", None)
-        body_text = str(body).strip() if body is not None else ""
-        msg = f"Error: {body_text[:500]}" if body_text else f"Error calling Azure OpenAI: {e}"
-        retry_after = LLMProvider._extract_retry_after_from_headers(getattr(response, "headers", None))
-        if retry_after is None:
-            retry_after = LLMProvider._extract_retry_after(msg)
-        return LLMResponse(content=msg, finish_reason="error", retry_after=retry_after)
+        pass
 
     # ------------------------------------------------------------------
     # Public API
@@ -137,15 +104,7 @@ class AzureOpenAIProvider(LLMProvider):
         reasoning_effort: str | None = None,
         tool_choice: str | dict[str, Any] | None = None,
     ) -> LLMResponse:
-        body = self._build_body(
-            messages, tools, model, max_tokens, temperature,
-            reasoning_effort, tool_choice,
-        )
-        try:
-            response = await self._client.responses.create(**body)
-            return parse_response_output(response)
-        except Exception as e:
-            return self._handle_error(e)
+        pass
 
     async def chat_stream(
         self,
@@ -158,26 +117,7 @@ class AzureOpenAIProvider(LLMProvider):
         tool_choice: str | dict[str, Any] | None = None,
         on_content_delta: Callable[[str], Awaitable[None]] | None = None,
     ) -> LLMResponse:
-        body = self._build_body(
-            messages, tools, model, max_tokens, temperature,
-            reasoning_effort, tool_choice,
-        )
-        body["stream"] = True
-
-        try:
-            stream = await self._client.responses.create(**body)
-            content, tool_calls, finish_reason, usage, reasoning_content = (
-                await consume_sdk_stream(stream, on_content_delta)
-            )
-            return LLMResponse(
-                content=content or None,
-                tool_calls=tool_calls,
-                finish_reason=finish_reason,
-                usage=usage,
-                reasoning_content=reasoning_content,
-            )
-        except Exception as e:
-            return self._handle_error(e)
+        pass
 
     def get_default_model(self) -> str:
-        return self.default_model
+        pass

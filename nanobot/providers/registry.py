@@ -65,7 +65,7 @@ class ProviderSpec:
 
     @property
     def label(self) -> str:
-        return self.display_name or self.name.title()
+        pass
 
 
 # ---------------------------------------------------------------------------
@@ -368,8 +368,4 @@ PROVIDERS: tuple[ProviderSpec, ...] = (
 
 def find_by_name(name: str) -> ProviderSpec | None:
     """Find a provider spec by config field name, e.g. "dashscope"."""
-    normalized = to_snake(name.replace("-", "_"))
-    for spec in PROVIDERS:
-        if spec.name == normalized:
-            return spec
-    return None
+    pass

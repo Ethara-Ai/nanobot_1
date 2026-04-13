@@ -28,39 +28,7 @@ class SearchUsageInfo:
 
     def format(self) -> str:
         """Return a human-readable multi-line string for /status output."""
-        lines = [f"🔍 Web Search: {self.provider}"]
-
-        if not self.supported:
-            lines.append("   Usage tracking: not available for this provider")
-            return "\n".join(lines)
-
-        if self.error:
-            lines.append(f"   Usage: unavailable ({self.error})")
-            return "\n".join(lines)
-
-        if self.used is not None and self.limit is not None:
-            lines.append(f"   Usage: {self.used} / {self.limit} requests")
-        elif self.used is not None:
-            lines.append(f"   Usage: {self.used} requests")
-
-        # Tavily breakdown
-        breakdown_parts = []
-        if self.search_used is not None:
-            breakdown_parts.append(f"Search: {self.search_used}")
-        if self.extract_used is not None:
-            breakdown_parts.append(f"Extract: {self.extract_used}")
-        if self.crawl_used is not None:
-            breakdown_parts.append(f"Crawl: {self.crawl_used}")
-        if breakdown_parts:
-            lines.append(f"   Breakdown: {' | '.join(breakdown_parts)}")
-
-        if self.remaining is not None:
-            lines.append(f"   Remaining: {self.remaining} requests")
-
-        if self.reset_date:
-            lines.append(f"   Resets: {self.reset_date}")
-
-        return "\n".join(lines)
+        pass
 
 
 async def fetch_search_usage(
@@ -77,13 +45,7 @@ async def fetch_search_usage(
     Returns:
         SearchUsageInfo with populated fields where available.
     """
-    p = (provider or "duckduckgo").strip().lower()
-
-    if p == "tavily":
-        return await _fetch_tavily_usage(api_key)
-    else:
-        # brave, duckduckgo, searxng, jina, unknown — no usage API
-        return SearchUsageInfo(provider=p, supported=False)
+    pass
 
 
 # ---------------------------------------------------------------------------
@@ -92,37 +54,7 @@ async def fetch_search_usage(
 
 async def _fetch_tavily_usage(api_key: str | None) -> SearchUsageInfo:
     """Fetch usage from GET https://api.tavily.com/usage."""
-    import httpx
-
-    key = api_key or os.environ.get("TAVILY_API_KEY", "")
-    if not key:
-        return SearchUsageInfo(
-            provider="tavily",
-            supported=True,
-            error="TAVILY_API_KEY not configured",
-        )
-
-    try:
-        async with httpx.AsyncClient(timeout=8.0) as client:
-            r = await client.get(
-                "https://api.tavily.com/usage",
-                headers={"Authorization": f"Bearer {key}"},
-            )
-            r.raise_for_status()
-        data: dict[str, Any] = r.json()
-        return _parse_tavily_usage(data)
-    except httpx.HTTPStatusError as e:
-        return SearchUsageInfo(
-            provider="tavily",
-            supported=True,
-            error=f"HTTP {e.response.status_code}",
-        )
-    except Exception as e:
-        return SearchUsageInfo(
-            provider="tavily",
-            supported=True,
-            error=str(e)[:80],
-        )
+    pass
 
 
 def _parse_tavily_usage(data: dict[str, Any]) -> SearchUsageInfo:
@@ -145,24 +77,6 @@ def _parse_tavily_usage(data: dict[str, Any]) -> SearchUsageInfo:
       }
     }
     """
-    account = data.get("account") or {}
-    used = account.get("plan_usage")
-    limit = account.get("plan_limit")
-
-    # Compute remaining
-    remaining = None
-    if used is not None and limit is not None:
-        remaining = max(0, limit - used)
-
-    return SearchUsageInfo(
-        provider="tavily",
-        supported=True,
-        used=used,
-        limit=limit,
-        remaining=remaining,
-        search_used=account.get("search_usage"),
-        extract_used=account.get("extract_usage"),
-        crawl_used=account.get("crawl_usage"),
-    )
+    pass
 
 

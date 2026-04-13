@@ -19,26 +19,26 @@ class MessageBus:
 
     async def publish_inbound(self, msg: InboundMessage) -> None:
         """Publish a message from a channel to the agent."""
-        await self.inbound.put(msg)
+        pass
 
     async def consume_inbound(self) -> InboundMessage:
         """Consume the next inbound message (blocks until available)."""
-        return await self.inbound.get()
+        pass
 
     async def publish_outbound(self, msg: OutboundMessage) -> None:
         """Publish a response from the agent to channels."""
-        await self.outbound.put(msg)
+        pass
 
     async def consume_outbound(self) -> OutboundMessage:
         """Consume the next outbound message (blocks until available)."""
-        return await self.outbound.get()
+        pass
 
     @property
     def inbound_size(self) -> int:
         """Number of pending inbound messages."""
-        return self.inbound.qsize()
+        pass
 
     @property
     def outbound_size(self) -> int:
         """Number of pending outbound messages."""
-        return self.outbound.qsize()
+        pass
